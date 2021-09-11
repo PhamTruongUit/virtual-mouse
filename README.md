@@ -4,7 +4,7 @@
 * autopy
 * numpy
 ## Run
-Run the ```AIVirtualMouse.py``` python file.
+Run the ```main.py``` python file.
 ## Toturial
 * 1 finger to move the cursor
 * 2 finger to left click 
