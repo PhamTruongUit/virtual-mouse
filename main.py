@@ -6,7 +6,7 @@ import autopy
 
 ######################
 wCam, hCam = 640, 480
-frameR = 50     #Frame Reduction
+frameR = 100     #Frame Reduction
 smoothening = 7  #random value
 ######################
 
@@ -34,43 +34,41 @@ while True:
         fingers = detector.fingersUp()
         cv2.rectangle(img, (frameR, frameR), (wCam - frameR, hCam - frameR),
                       (255, 0, 255), 2)
+        if fingers == [0,1,0,0,0]:
+            # Step5: Convert the coordinates
+            x3 = np.interp(x1, (frameR, wCam-frameR), (0, wScr))
+            y3 = np.interp(y1, (frameR, hCam-frameR), (0, hScr))
 
-        # Step4: Only Index Finger: Moving Mode
-        if fingers[1] == 1:
-            if fingers[2] == 0:
-                # Step5: Convert the coordinates
-                x3 = np.interp(x1, (frameR, wCam-frameR), (0, wScr))
-                y3 = np.interp(y1, (frameR, hCam-frameR), (0, hScr))
+            # Step6: Smooth Values
+            clocX = plocX + (x3 - plocX) / smoothening
+            clocY = plocY + (y3 - plocY) / smoothening
 
-                # Step6: Smooth Values
-                clocX = plocX + (x3 - plocX) / smoothening
-                clocY = plocY + (y3 - plocY) / smoothening
-
-                # Step7: Move Mouse
-                autopy.mouse.move(wScr - clocX, clocY)
-                cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
-                plocX, plocY = clocX, clocY
+            # Step7: Move Mouse
+            autopy.mouse.move(wScr - clocX, clocY)
+            cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
+            plocX, plocY = clocX, clocY
 
         # Step8: Both Index and middle are up: Clicking Mode
-            elif fingers[2] == 1:
-                if fingers[3] == 0:
-                    # Step9: Find distance between fingers
-                    length, img, lineInfo = detector.findDistance(8, 12, img)
-                    # Step10: Click double mouse if distance short
-                    if length < 40:
-                        cv2.circle(img, (lineInfo[4], lineInfo[5]), 15, (0, 255, 0), cv2.FILLED)
-                        autopy.mouse.click()
-                        time.sleep(0.5)
-        
-                elif fingers[3] == 1:
-                    # Step9: Find distance between fingers
-                    length, img, lineInfo = detector.findDistance(8, 12, img)
-                    # Step10: Click mouse if distance short
-                    if length < 40:
-                        cv2.circle(img, (lineInfo[4], lineInfo[5]), 15, (0, 255, 0), cv2.FILLED)
-                        autopy.mouse.click() 
-                        autopy.mouse.click()
-                        time.sleep(0.5)
+        if fingers[2] == 1:
+            if fingers[3] == 0:
+                # Step9: Find distance between fingers
+                length, img, lineInfo = detector.findDistance(8, 12, img)
+                # Step10: Click double mouse if distance short
+                # autopy.mouse.toggle(LEFT, False)
+                if length < 40:
+                    cv2.circle(img, (lineInfo[4], lineInfo[5]), 15, (0, 255, 0), cv2.FILLED)
+                    autopy.mouse.click(None)
+                    # autopy.mouse.click(None) 
+                    time.sleep(0.05)
+            elif fingers[3] == 1:
+                # Step9: Find distance between fingers
+                length, img, lineInfo = detector.findDistance(8, 12, img)
+                # Step10: Click mouse if distance short
+                if length < 40:
+                    cv2.circle(img, (lineInfo[4], lineInfo[5]), 15, (0, 255, 0), cv2.FILLED)
+                    autopy.mouse.click(None) 
+                    autopy.mouse.click(None)
+                    time.sleep(0.05)
 
     # Step11: Frame rate
     cTime = time.time()
