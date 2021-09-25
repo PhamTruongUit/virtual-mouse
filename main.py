@@ -67,4 +67,4 @@ while True:
                 
     cv2.imshow("Image", img)
     # breaking with ESC
-    if cv2.waitKey(33) == 27: break
+    if cv2.waitKey(1) == 27: break
